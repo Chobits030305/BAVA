@@ -4,28 +4,34 @@
   <meta charset="UTF-8">
   <title>BAVA</title>
 
+  <!-- ✅ MUY IMPORTANTE PARA IPHONE -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
   <style>
     body {
       background: #0f0f0f;
       color: white;
-      font-family: Arial, sans-serif;
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", Arial, sans-serif;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      min-height: 100vh;
       margin: 0;
       cursor: pointer;
     }
 
     .container {
       text-align: center;
-      max-width: 300px;
+      width: 100%;
+      max-width: 360px;
+      padding: 20px;
     }
 
     h1 {
-      font-size: 20px;
-      margin-bottom: 20px;
-      font-weight: normal;
+      font-size: 22px;
+      margin-bottom: 24px;
+      font-weight: 400;
+      letter-spacing: 0.4px;
       opacity: 1;
       transition: opacity 1s ease;
     }
@@ -35,8 +41,10 @@
     }
 
     img {
-      width: 260px;
-      border-radius: 12px;
+      width: 100%;
+      max-width: 300px;
+      height: auto;
+      border-radius: 14px;
       opacity: 0;
       transition: opacity 1s ease;
     }
@@ -46,8 +54,9 @@
     }
 
     .text {
-      margin-top: 20px;
-      font-size: 15px;
+      margin-top: 22px;
+      font-size: 16px;
+      line-height: 1.5;
       opacity: 0;
       transition: opacity 1.5s ease;
     }
@@ -57,7 +66,7 @@
     }
 
     .hint {
-      margin-top: 10px;
+      margin-top: 12px;
       font-size: 12px;
       opacity: 0.4;
     }
@@ -121,7 +130,6 @@
     function next() {
       if (index >= steps.length) return;
 
-      // Ocultar título después del primer click
       if (index > 0) {
         title.classList.add("hide");
       }
@@ -146,7 +154,6 @@
           return;
         }
 
-        // PASOS NORMALES
         photo.src = steps[index].img;
         photo.style.display = "block";
         photo.classList.add("show");
@@ -161,9 +168,7 @@
       }, 300);
     }
 
-    // Mostrar la primera imagen
     next();
   </script>
 </body>
 </html>
-
