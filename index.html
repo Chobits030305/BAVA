@@ -3,8 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <title>BAVA</title>
-
-  <!-- ✅ MUY IMPORTANTE PARA IPHONE -->
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
@@ -32,7 +30,6 @@
       margin-bottom: 24px;
       font-weight: 400;
       letter-spacing: 0.4px;
-      opacity: 1;
       transition: opacity 1s ease;
     }
 
@@ -45,7 +42,6 @@
       margin: 0 auto;
       width: 100%;
       max-width: 300px;
-      height: auto;
       border-radius: 14px;
       opacity: 0;
       transition: opacity 1s ease;
@@ -58,7 +54,7 @@
     .text {
       margin-top: 22px;
       font-size: 16px;
-      line-height: 1.5;
+      line-height: 1.6;
       opacity: 0;
       transition: opacity 1.5s ease;
     }
@@ -67,20 +63,17 @@
       opacity: 1;
     }
 
-    .hint {
-      margin-top: 12px;
-      font-size: 12px;
-      opacity: 0.4;
-    }
-
-    /* MENSAJE FINAL */
     #finalMessage {
       display: none;
       opacity: 0;
       transition: opacity 1.5s ease;
-      font-size: 16px;
-      line-height: 1.6;
       margin-top: 30px;
+    }
+
+    .hint {
+      margin-top: 12px;
+      font-size: 12px;
+      opacity: 0.4;
     }
   </style>
 </head>
@@ -88,90 +81,112 @@
 <body onclick="next()">
   <div class="container">
 
-    <!-- TÍTULO -->
     <h1 id="title">Momentos</h1>
 
-    <!-- IMAGEN -->
     <img id="photo" src="" alt="">
 
-    <!-- TEXTO NORMAL -->
-    <div id="text" class="text"></div>
-
-    <!-- MENSAJE FINAL -->
     <div id="finalMessage">
       <p>
         No sé qué pase en el futuro,<br>
         pero los días contigo<br>
-        siempre han sido increibles.❤️
+        siempre han sido increíbles. ❤️
       </p>
     </div>
 
-    <!-- HINT -->
     <div class="hint" id="hint">(haz click)</div>
   </div>
 
+  <audio id="music" loop>
+    <source src="musica.mp3" type="audio/mpeg">
+  </audio>
+
   <script>
-    const steps = [
-      { img: "foto6.jpg", text: "" },
-      { img: "foto2.jpg", text: "" },
-      { img: "foto1.jpg", text: "" },
-      { img: "foto9.jpg", text: "" },
-      { img: "foto7.jpg", text: "" },
-      { img: "foto5.jpg", text: "" },
-      { img: "foto3.jpg", text: "" },
-      { img: "foto4.jpg", text: "" },
-      { img: "", text: "final" }
-    ];
+  const steps = [
+    "foto6.jpg",
+    "foto2.jpg",
+    "foto1.jpg",
+    "foto9.jpg",
+    "foto7.jpg",
+    "foto8.jpg",
+    "foto10.jpg",
+    "foto3.jpg",
+    "foto4.jpg"
+  ];
 
-    let index = 0;
-    const photo = document.getElementById("photo");
-    const text = document.getElementById("text");
-    const title = document.getElementById("title");
-    const finalMessage = document.getElementById("finalMessage");
-    const hint = document.getElementById("hint");
+  const finalPhoto = "foto5.jpg";
 
-    function next() {
-      if (index >= steps.length) return;
+  let index = 0;
+  let stage = "photos"; // photos → text → lastPhoto
+  let musicStarted = false;
 
-      if (index > 0) {
+  const photo = document.getElementById("photo");
+  const title = document.getElementById("title");
+  const finalMessage = document.getElementById("finalMessage");
+  const hint = document.getElementById("hint");
+  const music = document.getElementById("music");
+
+  function next() {
+
+    // 🎵 música (iPhone friendly)
+    if (!musicStarted) {
+      music.play().catch(() => {});
+      musicStarted = true;
+    }
+
+    // 📸 FASE DE FOTOS
+    if (stage === "photos") {
+
+      // ocultar título DESPUÉS de la primera foto
+      if (index === 1) {
         title.classList.add("hide");
       }
 
+      // terminar fotos → mostrar texto
+      if (index >= steps.length) {
+        stage = "text";
+
+        photo.classList.remove("show");
+        setTimeout(() => {
+          photo.style.display = "none";
+          finalMessage.style.display = "block";
+          setTimeout(() => finalMessage.style.opacity = 1, 200);
+        }, 800);
+
+        return;
+      }
+
+      // transición lenta entre fotos
       photo.classList.remove("show");
-      text.classList.remove("show");
 
       setTimeout(() => {
-
-        // MENSAJE FINAL
-        if (!steps[index].img && steps[index].text === "final") {
-          photo.style.display = "none";
-          text.style.display = "none";
-          hint.style.display = "none";
-
-          finalMessage.style.display = "block";
-          setTimeout(() => {
-            finalMessage.style.opacity = 1;
-          }, 100);
-
-          index++;
-          return;
-        }
-
-        photo.src = steps[index].img;
+        photo.src = steps[index];
         photo.style.display = "block";
         photo.classList.add("show");
-
-        text.textContent = steps[index].text;
-        if (steps[index].text) {
-          text.classList.add("show");
-        }
-
         index++;
+      }, 700); // ← transición lenta
 
-      }, 300);
+      return;
     }
 
-    next();
-  </script>
+    // 📝 TEXTO → FOTO FINAL
+    if (stage === "text") {
+      stage = "lastPhoto";
+      finalMessage.style.opacity = 0;
+      hint.style.display = "none";
+
+      setTimeout(() => {
+        finalMessage.style.display = "none";
+        photo.src = finalPhoto;
+        photo.style.display = "block";
+        setTimeout(() => photo.classList.add("show"), 300);
+      }, 900);
+    }
+  }
+
+  // mostrar primera imagen CON título
+  photo.src = steps[0];
+  photo.classList.add("show");
+  index = 1;
+</script>
 </body>
 </html>
