@@ -30,7 +30,8 @@
       margin-bottom: 24px;
       font-weight: 400;
       letter-spacing: 0.4px;
-      transition: opacity 1s ease;
+      opacity: 1;
+      transition: opacity 1.5s ease;
     }
 
     h1.hide {
@@ -44,22 +45,10 @@
       max-width: 300px;
       border-radius: 14px;
       opacity: 0;
-      transition: opacity 1s ease;
-    }
-
-    img.show {
-      opacity: 1;
-    }
-
-    .text {
-      margin-top: 22px;
-      font-size: 16px;
-      line-height: 1.6;
-      opacity: 0;
       transition: opacity 1.5s ease;
     }
 
-    .text.show {
+    img.show {
       opacity: 1;
     }
 
@@ -68,6 +57,17 @@
       opacity: 0;
       transition: opacity 1.5s ease;
       margin-top: 30px;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .caption {
+      margin-top: 12px;
+      font-size: 14px;
+      color: #cfcfcf;
+      line-height: 1.4;
+      opacity: 0;
+      transition: opacity 1.5s ease;
     }
 
     .hint {
@@ -81,10 +81,16 @@
 <body onclick="next()">
   <div class="container">
 
+    <!-- TÍTULO -->
     <h1 id="title">Momentos</h1>
 
+    <!-- FOTO -->
     <img id="photo" src="" alt="">
 
+    <!-- PIE DE FOTO -->
+    <div id="caption" class="caption"></div>
+
+    <!-- TEXTO FINAL -->
     <div id="finalMessage">
       <p>
         No sé qué pase en el futuro,<br>
@@ -96,97 +102,109 @@
     <div class="hint" id="hint">(haz click)</div>
   </div>
 
-  <audio id="music" loop>
+  <!-- MÚSICA -->
+  <audio id="music" preload="auto">
     <source src="musica2.mp3" type="audio/mpeg">
   </audio>
 
   <script>
-  const steps = [
-    "foto6.jpg",
-    "foto2.jpg",
-    "foto1.jpg",
-    "foto9.jpg",
-    "foto7.jpg",
-    "foto8.jpg",
-    "foto10.jpg",
-    "foto3.jpg",
-    "foto4.jpg"
-  ];
+    const photos = [
+      "foto6.jpg",
+      "foto2.jpg",
+      "foto1.jpg",
+      "foto9.jpg",
+      "foto7.jpg",
+      "foto8.jpg",
+      "foto10.jpg",
+      "foto3.jpg",
+      "foto4.jpg"
+    ];
 
-  const finalPhoto = "foto5.jpg";
+    const lastPhoto = "foto5.jpg";
 
-  let index = 0;
-  let stage = "photos"; // photos → text → lastPhoto
-  let musicStarted = false;
+    let index = 0;
+    let stage = "photos";
+    let musicStarted = false;
 
-  const photo = document.getElementById("photo");
-  const title = document.getElementById("title");
-  const finalMessage = document.getElementById("finalMessage");
-  const hint = document.getElementById("hint");
-  const music = document.getElementById("music");
+    const photo = document.getElementById("photo");
+    const title = document.getElementById("title");
+    const finalMessage = document.getElementById("finalMessage");
+    const caption = document.getElementById("caption");
+    const hint = document.getElementById("hint");
+    const music = document.getElementById("music");
 
-  function next() {
+    // 🔑 SOLUCIÓN CLAVE: forzar música en el primer click REAL
+    document.body.addEventListener("click", () => {
+      if (music.paused) {
+        music.volume = 0.6;
+        music.play();
+      }
+    }, { once: true });
 
-    // 🎵 música (iPhone friendly)
-    if (!musicStarted) {
-      music.play().catch(() => {});
-      musicStarted = true;
-    }
+    function next() {
 
-    // 📸 FASE DE FOTOS
-    if (stage === "photos") {
-
-      // ocultar título DESPUÉS de la primera foto
-      if (index === 1) {
-        title.classList.add("hide");
+      if (!musicStarted) {
+        musicStarted = true;
+        music.volume = 0.6;
+        music.play();
       }
 
-      // terminar fotos → mostrar texto
-      if (index >= steps.length) {
-        stage = "text";
+      if (stage === "photos") {
+
+        if (index === 1) {
+          title.classList.add("hide");
+        }
+
+        if (index >= photos.length) {
+          stage = "text";
+          photo.classList.remove("show");
+
+          setTimeout(() => {
+            photo.style.display = "none";
+            finalMessage.style.display = "block";
+            setTimeout(() => finalMessage.style.opacity = 1, 300);
+          }, 800);
+
+          return;
+        }
 
         photo.classList.remove("show");
+        caption.style.opacity = 0;
+
         setTimeout(() => {
-          photo.style.display = "none";
-          finalMessage.style.display = "block";
-          setTimeout(() => finalMessage.style.opacity = 1, 200);
-        }, 800);
+          photo.src = photos[index];
+          photo.style.display = "block";
+          photo.classList.add("show");
+          index++;
+        }, 600);
 
         return;
       }
 
-      // transición lenta entre fotos
-      photo.classList.remove("show");
+      if (stage === "text") {
+        stage = "lastPhoto";
+        finalMessage.style.opacity = 0;
+        hint.style.display = "none";
 
-      setTimeout(() => {
-        photo.src = steps[index];
-        photo.style.display = "block";
-        photo.classList.add("show");
-        index++;
-      }, 700); // ← transición lenta
+        setTimeout(() => {
+          finalMessage.style.display = "none";
+          photo.src = lastPhoto;
+          photo.style.display = "block";
 
-      return;
+          caption.innerHTML =
+            "Mientras uno esté vivo,<br>uno debe amar lo más que pueda. 🫂";
+
+          setTimeout(() => {
+            photo.classList.add("show");
+            caption.style.opacity = 1;
+          }, 500);
+
+        }, 1000);
+      }
     }
 
-    // 📝 TEXTO → FOTO FINAL
-    if (stage === "text") {
-      stage = "lastPhoto";
-      finalMessage.style.opacity = 0;
-      hint.style.display = "none";
-
-      setTimeout(() => {
-        finalMessage.style.display = "none";
-        photo.src = finalPhoto;
-        photo.style.display = "block";
-        setTimeout(() => photo.classList.add("show"), 300);
-      }, 900);
-    }
-  }
-
-  // mostrar primera imagen CON título
-  photo.src = steps[0];
-  photo.classList.add("show");
-  index = 1;
-</script>
+    // primera foto automática (sin música)
+    next();
+  </script>
 </body>
 </html>
